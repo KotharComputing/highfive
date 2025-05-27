@@ -9,6 +9,7 @@
     5101
   ],
   "remoteUser": "kothar",
+  "containerUser": "kothar",
   "customizations": {
     "vscode": {
       "extensions": [
