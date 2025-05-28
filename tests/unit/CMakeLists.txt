@@ -5,11 +5,19 @@ if(MSVC)
   add_definitions(/bigobj)
 endif()
 
+# find_package(HDF5 REQUIRED COMPONENTS CXX)
+# add_compile_definitions(H5Cpp_H)
+set(HDF5_INCLUDE_DIRS "/usr/local/include;/usr/local/vol-rest/include")
+set(HDF5_LIBRARIES "/usr/local/lib/libhdf5_cpp.so;/usr/local/lib/libhdf5.so;/usr/local/vol-rest/lib/librest_vol.so")
+
 ## Base tests
+# foreach(test_name tests_high_five_base)
 foreach(test_name tests_high_five_base tests_high_five_easy test_all_types test_high_five_selection tests_high_five_data_type test_boost test_empty_arrays test_legacy test_opencv test_string test_stl test_xtensor)
   add_executable(${test_name} "${test_name}.cpp")
-  target_link_libraries(${test_name} HighFive HighFiveWarnings HighFiveFlags Catch2::Catch2WithMain)
-  target_link_libraries(${test_name} HighFiveOptionalDependencies)
+  target_link_libraries(${test_name} PRIVATE HighFive HighFiveWarnings HighFiveFlags Catch2::Catch2WithMain)
+  target_link_libraries(${test_name} PRIVATE HighFiveOptionalDependencies)
+  target_include_directories(${test_name} PRIVATE ${HDF5_INCLUDE_DIRS})
+  target_link_libraries(${test_name} PRIVATE ${HDF5_LIBRARIES})
 
   catch_discover_tests(${test_name})
 endforeach()

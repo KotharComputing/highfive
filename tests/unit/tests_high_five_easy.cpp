@@ -65,14 +65,14 @@ TEST_CASE("H5Easy_Compression") {
 }
 
 TEST_CASE("H5Easy_scalar") {
-    H5Easy::File file("h5easy_scalar.h5", H5Easy::File::Overwrite);
+    H5Easy::File file("/h5easy_scalar.h5", H5Easy::File::Overwrite);
 
     double a = 1.2345;
     int b = 12345;
     std::string c = "12345";
     std::complex<double> d = std::complex<double>(1.2345, -5.4321);
     std::complex<int32_t> e = std::complex<int32_t>(12345, -54321);
-
+    file.createGroup("/path/to");
     H5Easy::dump(file, "/path/to/a", a);
     H5Easy::dump(file, "/path/to/b", b);
     H5Easy::dump(file, "/path/to/c", c);
@@ -94,7 +94,7 @@ TEST_CASE("H5Easy_scalar") {
 }
 
 TEST_CASE("H5Easy_vector1d") {
-    H5Easy::File file("h5easy_vector1d.h5", H5Easy::File::Overwrite);
+    H5Easy::File file("/h5easy_vector1d.h5", H5Easy::File::Overwrite);
 
     std::vector<size_t> a = {1, 2, 3, 4, 5};
     std::vector<std::complex<double>> b = {std::complex<double>(1, .1),
@@ -108,6 +108,7 @@ TEST_CASE("H5Easy_vector1d") {
                                             std::complex<int32_t>(4, -2),
                                             std::complex<int32_t>(5, -1)};
 
+    file.createGroup("/path/to");
     H5Easy::dump(file, "/path/to/a", a);
     H5Easy::dump(file, "/path/to/b", b);
     H5Easy::dump(file, "/path/to/c", c);
@@ -124,10 +125,10 @@ TEST_CASE("H5Easy_vector1d") {
 }
 
 TEST_CASE("H5Easy_vector2d") {
-    H5Easy::File file("h5easy_vector2d.h5", H5Easy::File::Overwrite);
+    H5Easy::File file("/h5easy_vector2d.h5", H5Easy::File::Overwrite);
 
     std::vector<std::vector<size_t>> a({{0, 1}, {2, 3}, {4, 5}});
-
+    file.createGroup("/path/to");
     H5Easy::dump(file, "/path/to/a", a);
 
     decltype(a) a_r = H5Easy::load<decltype(a)>(file, "/path/to/a");
@@ -136,10 +137,10 @@ TEST_CASE("H5Easy_vector2d") {
 }
 
 TEST_CASE("H5Easy_vector2d_compression") {
-    H5Easy::File file("h5easy_vector2d_compression.h5", H5Easy::File::Overwrite);
+    H5Easy::File file("/h5easy_vector2d_compression.h5", H5Easy::File::Overwrite);
 
     std::vector<std::vector<size_t>> a({{0, 1}, {2, 3}, {4, 5}});
-
+    file.createGroup("/path/to");
     H5Easy::dump(file, "/path/to/a", a, H5Easy::DumpOptions(H5Easy::Compression(9)));
 
     H5Easy::dump(file,
@@ -153,12 +154,12 @@ TEST_CASE("H5Easy_vector2d_compression") {
 }
 
 TEST_CASE("H5Easy_vector3d") {
-    H5Easy::File file("h5easy_vector3d.h5", H5Easy::File::Overwrite);
+    H5Easy::File file("/h5easy_vector3d.h5", H5Easy::File::Overwrite);
 
     using type = std::vector<std::vector<std::vector<size_t>>>;
 
     type a({{{0, 1}, {2, 3}}, {{4, 5}, {6, 7}}, {{8, 9}, {10, 11}}});
-
+    file.createGroup("/path/to");
     H5Easy::dump(file, "/path/to/a", a);
 
     type a_r = H5Easy::load<type>(file, "/path/to/a");
@@ -193,9 +194,10 @@ void check_attribute(H5Easy::File& file, const std::string& path) {
 }
 
 TEST_CASE("H5Easy_Attribute_scalar") {
-    H5Easy::File file("h5easy_attribute_scalar.h5", H5Easy::File::Overwrite);
+    H5Easy::File file("/h5easy_attribute_scalar.h5", H5Easy::File::Overwrite);
 
     std::string path = "/path/to/x";
+    file.createGroup("/path/to");
     H5Easy::dump(file, path, 1.0);
 
     SECTION("dataset") {
@@ -212,7 +214,7 @@ TEST_CASE("H5Easy_Attribute_scalar") {
 
 #ifdef HIGHFIVE_TEST_XTENSOR
 TEST_CASE("H5Easy_extend1d") {
-    H5Easy::File file("h5easy_extend1d.h5", H5Easy::File::Overwrite);
+    H5Easy::File file("/h5easy_extend1d.h5", H5Easy::File::Overwrite);
 
     for (size_t i = 0; i < 10; ++i) {
         H5Easy::dump(file, "/path/to/A", i, {i});
@@ -229,7 +231,7 @@ TEST_CASE("H5Easy_extend1d") {
 }
 
 TEST_CASE("H5Easy_extend2d") {
-    H5Easy::File file("h5easy_extend2d.h5", H5Easy::File::Overwrite);
+    H5Easy::File file("/h5easy_extend2d.h5", H5Easy::File::Overwrite);
 
     for (size_t i = 0; i < 10; ++i) {
         for (size_t j = 0; j < 5; ++j) {
@@ -250,11 +252,11 @@ TEST_CASE("H5Easy_extend2d") {
 }
 
 TEST_CASE("H5Easy_xtensor") {
-    H5Easy::File file("h5easy_xtensor.h5", H5Easy::File::Overwrite);
+    H5Easy::File file("/h5easy_xtensor.h5", H5Easy::File::Overwrite);
 
     xt::xtensor<double, 2> A = 100. * xt::random::randn<double>({20, 5});
     xt::xtensor<int, 2> B = A;
-
+    file.createGroup("/path/to");
     H5Easy::dump(file, "/path/to/A", A);
     H5Easy::dump(file, "/path/to/B", B);
 
@@ -266,7 +268,7 @@ TEST_CASE("H5Easy_xtensor") {
 }
 
 TEST_CASE("H5Easy_xtensor_column_major") {
-    H5Easy::File file("h5easy_xtensor_colum_major.h5", H5Easy::File::Overwrite);
+    H5Easy::File file("/h5easy_xtensor_colum_major.h5", H5Easy::File::Overwrite);
 
     using column_major_t = xt::xtensor<double, 2, xt::layout_type::column_major>;
 
@@ -287,7 +289,7 @@ TEST_CASE("H5Easy_xtensor_column_major") {
 }
 
 TEST_CASE("H5Easy_xarray_column_major") {
-    H5Easy::File file("h5easy_xarray_colum_major.h5", H5Easy::File::Overwrite);
+    H5Easy::File file("/h5easy_xarray_colum_major.h5", H5Easy::File::Overwrite);
 
     using column_major_t = xt::xarray<double, xt::layout_type::column_major>;
 
@@ -308,11 +310,11 @@ TEST_CASE("H5Easy_xarray_column_major") {
 }
 
 TEST_CASE("H5Easy_xarray") {
-    H5Easy::File file("h5easy_xarray.h5", H5Easy::File::Overwrite);
+    H5Easy::File file("/h5easy_xarray.h5", H5Easy::File::Overwrite);
 
     xt::xarray<double> A = 100. * xt::random::randn<double>({20, 5});
     xt::xarray<int> B = A;
-
+    file.createGroup("/path/to");
     H5Easy::dump(file, "/path/to/A", A);
     H5Easy::dump(file, "/path/to/B", B);
 
@@ -324,11 +326,11 @@ TEST_CASE("H5Easy_xarray") {
 }
 
 TEST_CASE("H5Easy_view") {
-    H5Easy::File file("h5easy_view.h5", H5Easy::File::Overwrite);
+    H5Easy::File file("/h5easy_view.h5", H5Easy::File::Overwrite);
 
     xt::xtensor<double, 2> A = 100. * xt::random::randn<double>({20, 5});
     auto a = xt::view(A, xt::range(0, 10), xt::range(0, 10));
-
+    file.createGroup("/path/to");
     H5Easy::dump(file, "/path/to/a", a);
 
     xt::xtensor<double, 2> a_r = H5Easy::load<xt::xtensor<double, 2>>(file, "/path/to/a");
@@ -337,11 +339,11 @@ TEST_CASE("H5Easy_view") {
 }
 
 TEST_CASE("H5Easy_xtensor_compress") {
-    H5Easy::File file("h5easy_xtensor_compress.h5", H5Easy::File::Overwrite);
+    H5Easy::File file("/h5easy_xtensor_compress.h5", H5Easy::File::Overwrite);
 
     xt::xtensor<double, 2> A = 100. * xt::random::randn<double>({20, 5});
     xt::xtensor<int, 2> B = A;
-
+    file.createGroup("/path/to");
     H5Easy::dump(file, "/path/to/A", A, H5Easy::DumpOptions(H5Easy::Compression()));
 
     H5Easy::dump(file,
@@ -359,11 +361,11 @@ TEST_CASE("H5Easy_xtensor_compress") {
 }
 
 TEST_CASE("H5Easy_Attribute_xtensor") {
-    H5Easy::File file("h5easy_attribute_xtensor.h5", H5Easy::File::Overwrite);
+    H5Easy::File file("/h5easy_attribute_xtensor.h5", H5Easy::File::Overwrite);
 
     xt::xtensor<double, 2> A = 100. * xt::random::randn<double>({20, 5});
     xt::xtensor<int, 2> B = A;
-
+    file.createGroup("/path/to");
     H5Easy::dump(file, "/path/to/A", A);
     H5Easy::dumpAttribute(file, "/path/to/A", "A", A);
     H5Easy::dumpAttribute(file, "/path/to/A", "B", B);
@@ -379,11 +381,11 @@ TEST_CASE("H5Easy_Attribute_xtensor") {
 
 #ifdef HIGHFIVE_TEST_EIGEN
 TEST_CASE("H5Easy_Eigen_MatrixX") {
-    H5Easy::File file("h5easy_eigen_MatrixX.h5", H5Easy::File::Overwrite);
+    H5Easy::File file("/h5easy_eigen_MatrixX.h5", H5Easy::File::Overwrite);
 
     Eigen::MatrixXd A = 100. * Eigen::MatrixXd::Random(20, 5);
     Eigen::MatrixXi B = A.cast<int>();
-
+    file.createGroup("/path/to");
     H5Easy::dump(file, "/path/to/A", A);
     H5Easy::dump(file, "/path/to/B", B);
 
@@ -395,11 +397,11 @@ TEST_CASE("H5Easy_Eigen_MatrixX") {
 }
 
 TEST_CASE("H5Easy_Eigen_ArrayXX") {
-    H5Easy::File file("h5easy_eigen_ArrayXX.h5", H5Easy::File::Overwrite);
+    H5Easy::File file("/h5easy_eigen_ArrayXX.h5", H5Easy::File::Overwrite);
 
     Eigen::ArrayXXf A = 100. * Eigen::ArrayXXf::Random(20, 5);
     Eigen::ArrayXXi B = A.cast<int>();
-
+    file.createGroup("/path/to");
     H5Easy::dump(file, "/path/to/A", A);
     H5Easy::dump(file, "/path/to/B", B);
 
@@ -411,11 +413,11 @@ TEST_CASE("H5Easy_Eigen_ArrayXX") {
 }
 
 TEST_CASE("H5Easy_Eigen_ArrayX") {
-    H5Easy::File file("h5easy_eigen_ArrayX.h5", H5Easy::File::Overwrite);
+    H5Easy::File file("/h5easy_eigen_ArrayX.h5", H5Easy::File::Overwrite);
 
     Eigen::ArrayXf A = Eigen::ArrayXf::Random(50);
     Eigen::ArrayXi B = A.cast<int>();
-
+    file.createGroup("/path/to");
     H5Easy::dump(file, "/path/to/A", A);
     H5Easy::dump(file, "/path/to/B", B);
 
@@ -428,11 +430,11 @@ TEST_CASE("H5Easy_Eigen_ArrayX") {
 
 
 TEST_CASE("H5Easy_Eigen_VectorX") {
-    H5Easy::File file("h5easy_eigen_VectorX.h5", H5Easy::File::Overwrite);
+    H5Easy::File file("/h5easy_eigen_VectorX.h5", H5Easy::File::Overwrite);
 
     Eigen::VectorXd A = 100. * Eigen::VectorXd::Random(20);
     Eigen::VectorXi B = A.cast<int>();
-
+    file.createGroup("/path/to");
     H5Easy::dump(file, "/path/to/A", A);
     H5Easy::dump(file, "/path/to/B", B);
 
@@ -447,11 +449,11 @@ TEST_CASE("H5Easy_Eigen_MatrixXRowMajor") {
     typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> MatrixXd;
     typedef Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> MatrixXi;
 
-    H5Easy::File file("H5Easy_Eigen_MatrixXRowMajor.h5", H5Easy::File::Overwrite);
+    H5Easy::File file("/H5Easy_Eigen_MatrixXRowMajor.h5", H5Easy::File::Overwrite);
 
     MatrixXd A = 100. * MatrixXd::Random(20, 5);
     MatrixXi B = A.cast<int>();
-
+    file.createGroup("/path/to");
     H5Easy::dump(file, "/path/to/A", A);
     H5Easy::dump(file, "/path/to/B", B);
 
@@ -466,11 +468,11 @@ TEST_CASE("H5Easy_Eigen_VectorXRowMajor") {
     typedef Eigen::Matrix<double, 1, Eigen::Dynamic, Eigen::RowMajor> VectorXd;
     typedef Eigen::Matrix<int, 1, Eigen::Dynamic, Eigen::RowMajor> VectorXi;
 
-    H5Easy::File file("h5easy_eigen_VectorXRowMajor.h5", H5Easy::File::Overwrite);
+    H5Easy::File file("/h5easy_eigen_VectorXRowMajor.h5", H5Easy::File::Overwrite);
 
     VectorXd A = 100. * VectorXd::Random(20);
     VectorXi B = A.cast<int>();
-
+    file.createGroup("/path/to");
     H5Easy::dump(file, "/path/to/A", A);
     H5Easy::dump(file, "/path/to/B", B);
 
@@ -482,11 +484,11 @@ TEST_CASE("H5Easy_Eigen_VectorXRowMajor") {
 }
 
 TEST_CASE("H5Easy_Eigen_Map") {
-    H5Easy::File file("h5easy_eigen_Map.h5", H5Easy::File::Overwrite);
+    H5Easy::File file("/h5easy_eigen_Map.h5", H5Easy::File::Overwrite);
 
     std::vector<int> A = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     Eigen::Map<Eigen::VectorXi> mapped_vector(A.data(), static_cast<int>(A.size()));
-
+    file.createGroup("/path/to");
     H5Easy::dump(file, "/path/to/A", mapped_vector);
 
     std::vector<int> A_r = H5Easy::load<std::vector<int>>(file, "/path/to/A");
@@ -495,11 +497,11 @@ TEST_CASE("H5Easy_Eigen_Map") {
 }
 
 TEST_CASE("H5Easy_Attribute_Eigen_MatrixX") {
-    H5Easy::File file("h5easy_attribute_eigen_MatrixX.h5", H5Easy::File::Overwrite);
+    H5Easy::File file("/h5easy_attribute_eigen_MatrixX.h5", H5Easy::File::Overwrite);
 
     Eigen::MatrixXd A = 100. * Eigen::MatrixXd::Random(20, 5);
     Eigen::MatrixXi B = A.cast<int>();
-
+    file.createGroup("/path/to");
     H5Easy::dump(file, "/path/to/A", A);
     H5Easy::dumpAttribute(file, "/path/to/A", "A", A);
     H5Easy::dumpAttribute(file, "/path/to/A", "B", B);
@@ -514,7 +516,7 @@ TEST_CASE("H5Easy_Attribute_Eigen_MatrixX") {
 
 #ifdef HIGHFIVE_TEST_OPENCV
 TEST_CASE("H5Easy_OpenCV_Mat_") {
-    H5Easy::File file("h5easy_opencv_Mat_.h5", H5Easy::File::Overwrite);
+    H5Easy::File file("/h5easy_opencv_Mat_.h5", H5Easy::File::Overwrite);
 
     using T = typename cv::Mat_<double>;
 
@@ -531,7 +533,7 @@ TEST_CASE("H5Easy_OpenCV_Mat_") {
     A(2, 1) = 9.0;
     A(2, 2) = 10.0;
     A(2, 3) = 11.0;
-
+    file.createGroup("/path/to");
     H5Easy::dump(file, "/path/to/A", A);
     H5Easy::dumpAttribute(file, "/path/to/A", "attr", A);
 

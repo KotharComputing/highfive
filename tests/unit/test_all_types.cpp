@@ -23,7 +23,7 @@
 using namespace HighFive;
 
 TEMPLATE_TEST_CASE("Scalar in DataSet", "[Types]", bool, std::string) {
-    const std::string file_name("rw_dataset_" + typeNameHelper<TestType>() + ".h5");
+    const std::string file_name("/rw_dataset_" + typeNameHelper<TestType>() + ".h5");
     const std::string dataset_name("dset");
     TestType t1{};
 
@@ -54,7 +54,7 @@ TEMPLATE_TEST_CASE("Scalar in DataSet", "[Types]", bool, std::string) {
 
 #if HIGHFIVE_CXX_STD >= 17
 TEMPLATE_PRODUCT_TEST_CASE("Scalar in std::vector<std::byte>", "[Types]", std::vector, std::byte) {
-    const std::string file_name("rw_dataset_vector_" + typeNameHelper<TestType>() + ".h5");
+    const std::string file_name("/rw_dataset_vector_" + typeNameHelper<TestType>() + ".h5");
     const std::string dataset_name("dset");
     TestType t1(5, std::byte(0xCD));
 
@@ -145,7 +145,7 @@ void check_read_regular(const std::string& file_name, const std::vector<size_t>&
 
 template <class Container>
 void check_read_regular() {
-    const std::string file_name("rw_read_regular" + typeNameHelper<Container>() + ".h5");
+    const std::string file_name("/rw_read_regular" + typeNameHelper<Container>() + ".h5");
     auto dims = testing::DataGenerator<Container>::default_dims();
 
     check_read_regular<Container>(file_name, dims);
@@ -248,7 +248,7 @@ void check_write_regular(const std::string& file_name, const std::vector<size_t>
 
 template <class Container>
 void check_write_regular() {
-    std::string file_name("rw_write_regular" + typeNameHelper<Container>() + ".h5");
+    std::string file_name("/rw_write_regular" + typeNameHelper<Container>() + ".h5");
     auto dims = testing::DataGenerator<Container>::default_dims();
     check_write_regular<Container>(file_name, dims);
 }

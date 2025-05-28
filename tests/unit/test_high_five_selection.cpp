@@ -35,7 +35,7 @@ void selectionArraySimpleTest() {
     typedef typename std::vector<T> Vector;
 
     std::ostringstream filename;
-    filename << "h5_rw_select_test_" << typeNameHelper<T>() << "_test.h5";
+    filename << "/h5_rw_select_test_" << typeNameHelper<T>() << "_test.h5";
 
     const size_t size_x = 10;
     const size_t offset_x = 2, count_x = 5;
@@ -371,7 +371,7 @@ File setupHyperSlabFile(T (&values)[x_size][y_size],
 template <typename T>
 void regularHyperSlabSelectionTest() {
     std::ostringstream filename;
-    filename << "h5_rw_select_regular_hyperslab_test_" << typeNameHelper<T>() << "_test.h5";
+    filename << "/h5_rw_select_regular_hyperslab_test_" << typeNameHelper<T>() << "_test.h5";
     const std::string dataset_name("dset");
 
     const size_t x_size = 10;
@@ -486,7 +486,7 @@ std::vector<IrregularHyperSlabTestData> make_irregular_hyperslab_test_data() {
 template <typename T>
 void irregularHyperSlabSelectionReadTest() {
     std::ostringstream filename;
-    filename << "h5_write_select_irregular_hyperslab_test_" << typeNameHelper<T>() << "_test.h5";
+    filename << "/h5_write_select_irregular_hyperslab_test_" << typeNameHelper<T>() << "_test.h5";
 
     const std::string dataset_name("dset");
 
@@ -521,7 +521,7 @@ TEMPLATE_LIST_TEST_CASE("irregularHyperSlabSelectionRead", "[template]", numeric
 template <typename T>
 void irregularHyperSlabSelectionWriteTest() {
     std::ostringstream filename;
-    filename << "h5_write_select_irregular_hyperslab_test_" << typeNameHelper<T>() << "_test.h5";
+    filename << "/h5_write_select_irregular_hyperslab_test_" << typeNameHelper<T>() << "_test.h5";
 
     const std::string dataset_name("dset");
 
