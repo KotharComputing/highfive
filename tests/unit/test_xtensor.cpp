@@ -73,7 +73,7 @@ TEST_CASE("xt::xarray reshape", "[xtensor]") {
 }
 
 TEST_CASE("xt::xview example", "[xtensor]") {
-    File file("rw_dataset_xview.h5", File::Truncate);
+    File file("/rw_dataset_xview.h5", File::Truncate);
 
     std::vector<size_t> shape{13, 5, 7};
     xt::xarray<double> a = testing::DataGenerator<xt::xtensor<double, 3>>::create(shape);
@@ -106,12 +106,12 @@ void check_xtensor_scalar(File& file) {
 }
 
 TEST_CASE("xt::xarray scalar", "[xtensor]") {
-    File file("rw_dataset_xarray_scalar.h5", File::Truncate);
+    File file("/rw_dataset_xarray_scalar.h5", File::Truncate);
     check_xtensor_scalar<xt::xarray<double>>(file);
 }
 
 TEST_CASE("xt::xtensor scalar", "[xtensor]") {
-    File file("rw_dataset_xtensor_scalar.h5", File::Truncate);
+    File file("/rw_dataset_xtensor_scalar.h5", File::Truncate);
     check_xtensor_scalar<xt::xarray<double>>(file);
 }
 
@@ -128,13 +128,13 @@ void check_xtensor_empty(File& file, const XTensor& a, const std::vector<size_t>
 }
 
 TEST_CASE("xt::xtensor empty", "[xtensor]") {
-    File file("rw_dataset_xtensor_empty.h5", File::Truncate);
+    File file("/rw_dataset_xtensor_empty.h5", File::Truncate);
     xt::xtensor<double, 3> a({0, 1, 1});
     check_xtensor_empty(file, a, {0, 1, 1, 1});
 }
 
 TEST_CASE("xt::xarray empty", "[xtensor]") {
-    File file("rw_dataset_xarray_empty.h5", File::Truncate);
+    File file("/rw_dataset_xarray_empty.h5", File::Truncate);
     xt::xarray<double> a(std::vector<size_t>{1, 0, 1});
     check_xtensor_empty(file, a, {0});
 }

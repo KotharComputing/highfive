@@ -117,7 +117,7 @@ void selectionArraySimpleTestParallel(File& file) {
 template <typename T>
 void selectionArraySimpleTestParallelDefaultProps() {
     std::ostringstream filename;
-    filename << "h5_rw_default_props_select_parallel_test_" << typeNameHelper<T>() << "_test.h5";
+    filename << "/h5_rw_default_props_select_parallel_test_" << typeNameHelper<T>() << "_test.h5";
 
     // Create a new file using the default property lists.
     auto fapl = FileAccessProps{};
@@ -131,7 +131,7 @@ void selectionArraySimpleTestParallelDefaultProps() {
 template <typename T>
 void selectionArraySimpleTestParallelCollectiveMDProps() {
     std::ostringstream filename;
-    filename << "h5_rw_collective_md_props_select_parallel_test_" << typeNameHelper<T>()
+    filename << "/h5_rw_collective_md_props_select_parallel_test_" << typeNameHelper<T>()
              << "_test.h5";
 
     // Create a new file using the default property lists.

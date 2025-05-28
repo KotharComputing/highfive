@@ -249,42 +249,42 @@ TEST_CASE("HighFiveSTDString (dataset, nullterm cornercase)") {
 }
 
 TEST_CASE("HighFiveSTDString (dataset, single, short)") {
-    File file("std_string_dataset_single_short.h5", File::Truncate);
+    File file("/std_string_dataset_single_short.h5", File::Truncate);
     check_single_string<testing::DataSetCreateTraits>(file, 3);
 }
 
 TEST_CASE("HighFiveSTDString (attribute, single, short)") {
-    File file("std_string_attribute_single_short.h5", File::Truncate);
+    File file("/std_string_attribute_single_short.h5", File::Truncate);
     check_single_string<testing::AttributeCreateTraits>(file, 3);
 }
 
 TEST_CASE("HighFiveSTDString (dataset, single, long)") {
-    File file("std_string_dataset_single_long.h5", File::Truncate);
+    File file("/std_string_dataset_single_long.h5", File::Truncate);
     check_single_string<testing::DataSetCreateTraits>(file, 256);
 }
 
 TEST_CASE("HighFiveSTDString (attribute, single, long)") {
-    File file("std_string_attribute_single_long.h5", File::Truncate);
+    File file("/std_string_attribute_single_long.h5", File::Truncate);
     check_single_string<testing::AttributeCreateTraits>(file, 256);
 }
 
 TEST_CASE("HighFiveSTDString (dataset, multiple, short)") {
-    File file("std_string_dataset_multiple_short.h5", File::Truncate);
+    File file("/std_string_dataset_multiple_short.h5", File::Truncate);
     check_multiple_string<testing::DataSetCreateTraits>(file, 3);
 }
 
 TEST_CASE("HighFiveSTDString (attribute, multiple, short)") {
-    File file("std_string_attribute_multiple_short.h5", File::Truncate);
+    File file("/std_string_attribute_multiple_short.h5", File::Truncate);
     check_multiple_string<testing::AttributeCreateTraits>(file, 3);
 }
 
 TEST_CASE("HighFiveSTDString (dataset, multiple, long)") {
-    File file("std_string_dataset_multiple_long.h5", File::Truncate);
+    File file("/std_string_dataset_multiple_long.h5", File::Truncate);
     check_multiple_string<testing::DataSetCreateTraits>(file, 256);
 }
 
 TEST_CASE("HighFiveSTDString (attribute, multiple, long)") {
-    File file("std_string_attribute_multiple_long.h5", File::Truncate);
+    File file("/std_string_attribute_multiple_long.h5", File::Truncate);
     check_multiple_string<testing::AttributeCreateTraits>(file, 256);
 }
 
