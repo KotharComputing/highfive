@@ -62,7 +62,8 @@ endif()
 option(HIGHFIVE_UNIT_TESTS "Compile unit-tests" ${HIGHFIVE_EXTRAS_DEFAULT})
 option(HIGHFIVE_EXAMPLES "Compile examples" ${HIGHFIVE_EXTRAS_DEFAULT})
 option(HIGHFIVE_BUILD_DOCS "Build documentation" ${HIGHFIVE_EXTRAS_DEFAULT})
-
+option(HIGHFIVE_ENABLE_RESTVOL "Enable rest-vol API" OFF)
+set(RESTVOL_ROOT_DIR "" CACHE PATH "Path to the REST VOL installation")
 option(HIGHFIVE_TEST_SPAN "Enable testing std::span, requires C++20" ${HIGHFIVE_TEST_SPAN_DEFAULT})
 option(HIGHFIVE_TEST_BOOST "Enable testing Boost features" OFF)
 option(HIGHFIVE_TEST_BOOST_SPAN "Additionally, enable testing `boost::span`" OFF)
@@ -83,7 +84,11 @@ mark_as_advanced(HIGHFIVE_SANITIZER)
 
 # Check compiler cxx_std requirements
 # -----------------------------------
-set(HIGHFIVE_CXX_STANDARD_DEFAULT 14)
+if(HIGHFIVE_ENABLE_RESTVOL)
+    set(HIGHFIVE_CXX_STANDARD_DEFAULT 17)
+else()
+    set(HIGHFIVE_CXX_STANDARD_DEFAULT 14)
+endif()
 
 if(NOT DEFINED CMAKE_CXX_STANDARD)
     set(CMAKE_CXX_STANDARD ${HIGHFIVE_CXX_STANDARD_DEFAULT})
@@ -173,7 +178,7 @@ export(
 # Preparing local building (tests, examples)
 # ------------------------------------------
 
-if(HIGHFIVE_EXAMPLES OR HIGHFIVE_UNIT_TESTS)
+if(HIGHFIVE_EXAMPLES OR HIGHFIVE_UNIT_TESTS OR HIGHFIVE_ENABLE_RESTVOL)
   include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/HighFiveWarnings.cmake)
   include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/HighFiveFlags.cmake)
   include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/HighFiveOptionalDependencies.cmake)
