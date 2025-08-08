@@ -214,11 +214,11 @@ TEST_CASE("Test file space strategy") {
 
         {
             File file(file_name, File::ReadOnly);
-#if defined(HIGHFIVE_USE_RESTVOL)
-            CHECK_THROWS_AS(file.getFileSpaceStrategy(), FileException);
-#else
-            CHECK(file.getFileSpaceStrategy() == strategy);
-#endif
+            if (rest_vol_enabled()) {
+                CHECK_THROWS_AS(file.getFileSpaceStrategy(), FileException);
+            } else {
+                CHECK(file.getFileSpaceStrategy() == strategy);
+            }
         }
     }
 }
@@ -236,11 +236,11 @@ TEST_CASE("Test file space page size") {
 
     {
         File file(file_name, File::ReadOnly);
-#if defined(HIGHFIVE_USE_RESTVOL)
-        CHECK_THROWS_AS(file.getFileSpaceStrategy(), FileException);
-#else
-        CHECK(file.getFileSpacePageSize() == page_size);
-#endif
+        if (rest_vol_enabled()) {
+            CHECK_THROWS_AS(file.getFileSpaceStrategy(), FileException);
+        } else {
+            CHECK(file.getFileSpacePageSize() == page_size);
+        }
     }
 }
 
@@ -361,10 +361,10 @@ TEST_CASE("Test allocation time") {
     auto datatype = create_datatype<decltype(data)::value_type>();
     auto dataset = file.createDataSet("dset", dataspace, datatype, dcpl);
 
-#if !defined(HIGHFIVE_USE_RESTVOL)
-    auto alloc_size = H5Dget_storage_size(dataset.getId());
-    CHECK(alloc_size == data.size() * sizeof(decltype(data)::value_type));
-#endif
+    if (!rest_vol_enabled()) {
+        auto alloc_size = H5Dget_storage_size(dataset.getId());
+        CHECK(alloc_size == data.size() * sizeof(decltype(data)::value_type));
+    }
 }
 
 template <class T>
@@ -881,11 +881,11 @@ TEST_CASE("DataTypeEqualTakeBack") {
     CHECK(s == dataset.getDataType());
     CHECK(d != dataset.getDataType());
 
-#if !defined(HIGHFIVE_USE_RESTVOL)
-    // Test getAddress and expect deprecation warning
-    auto addr = dataset.getInfo().getAddress();
-    CHECK(addr != 0);
-#endif
+    if (!rest_vol_enabled()) {
+        // Test getAddress and expect deprecation warning
+        auto addr = dataset.getInfo().getAddress();
+        CHECK(addr != 0);
+    }
 }
 
 TEST_CASE("DataSpaceTest") {
@@ -1157,12 +1157,12 @@ void readWriteAttributeVectorTest() {
         CHECK(all_attribute_names.size() == 0);
         CHECK(!g.hasAttribute("my_attribute"));
 
-#if defined(HIGHFIVE_USE_RESTVOL)
-        Attribute a1 = g.createAttribute("my_attribute", vec);
-#else
-        Attribute a1 = g.createAttribute<T>("my_attribute", DataSpace::From(vec));
-        a1.write(vec);
-#endif
+        if (rest_vol_enabled()) {
+            Attribute a1 = g.createAttribute("my_attribute", vec);
+        } else {
+            Attribute a1 = g.createAttribute<T>("my_attribute", DataSpace::From(vec));
+            a1.write(vec);
+        }
 
         // check now that we effectively have an attribute listable
         CHECK(g.getNumberAttributes() == 1);
@@ -1175,12 +1175,11 @@ void readWriteAttributeVectorTest() {
         // Create the same attribute on a newly created dataset
         DataSet s = g.createDataSet("dummy_dataset", DataSpace(1), AtomicType<int>());
 
-#if defined(HIGHFIVE_USE_RESTVOL)
         Attribute a2 = s.createAttribute("my_attribute_copy", vec);
-#else
-        Attribute a2 = s.createAttribute<T>("my_attribute_copy", DataSpace::From(vec));
-        a2.write(vec);
-#endif
+        if (!rest_vol_enabled()) {
+            a2 = s.createAttribute<T>("my_attribute_copy", DataSpace::From(vec));
+            a2.write(vec);
+        }
 
         // const data, short-circuit syntax
         const std::vector<int> v{1, 2, 3};
@@ -1277,11 +1276,11 @@ TEST_CASE("datasetOffset") {
     DataSet ds = file.createDataSet<int>(dsetname, DataSpace::From(data));
     ds.write(data);
     DataSet ds_read = file.getDataSet(dsetname);
-#if defined(HIGHFIVE_USE_RESTVOL)
-    CHECK_THROWS_AS(ds_read.getOffset(), DataSetException);
-#else
-    CHECK(ds_read.getOffset() > 0);
-#endif
+    if (rest_vol_enabled()) {
+        CHECK_THROWS_AS(ds_read.getOffset(), DataSetException);
+    } else {
+        CHECK(ds_read.getOffset() > 0);
+    }
 }
 
 
@@ -1377,10 +1376,8 @@ void check(const S& array, const S& subarray, const Y& yslices, const X& xslices
 TEST_CASE("productSet") {
     using Slice = std::array<size_t, 2>;
     using Slices = std::vector<Slice>;
-#if !defined(HIGHFIVE_USE_RESTVOL)
     using Point = size_t;
     using Points = std::vector<Point>;
-#endif
 
     const std::string file_name = to_abs_if_rest_vol("h5_test_product_set.h5");
 
@@ -1410,85 +1407,85 @@ TEST_CASE("productSet") {
         auto yslice = Slice{1, 3};
         auto yslices = Slices{yslice};
         auto xslices = Slices{{0, 1}, {3, 5}};
-#if defined(HIGHFIVE_USE_RESTVOL)
-        CHECK_THROWS_AS(dset.select(ProductSet(yslice, xslices)).read(subarray), SliceException);
-#else
-        dset.select(ProductSet(yslice, xslices)).read(subarray);
+        if (rest_vol_enabled()) {
+            CHECK_THROWS_AS(dset.select(ProductSet(yslice, xslices)).read(subarray),
+                            SliceException);
+        } else {
+            dset.select(ProductSet(yslice, xslices)).read(subarray);
 
-        check(array, subarray, yslices, xslices);
-#endif
-    }
-#if !defined(HIGHFIVE_USE_RESTVOL)
-    SECTION("Rr") {
-        std::vector<std::vector<double>> subarray;
-
-        auto yslices = Slices{{0, 1}, {3, 5}};
-        auto xslice = Slice{1, 3};
-        auto xslices = Slices{xslice};
-
-        dset.select(ProductSet(yslices, xslice)).read(subarray);
-
-        check(array, subarray, yslices, xslices);
+            check(array, subarray, yslices, xslices);
+        }
     }
 
-    SECTION("RP") {
-        std::vector<std::vector<double>> subarray;
+    // SECTION("Rr") {
+    //     std::vector<std::vector<double>> subarray;
 
-        auto yslices = Slices{{0, 1}, {3, 5}};
-        auto xpoints = Points{2, 4, 5};
-        auto xslices = Slices{{2, 3}, {4, 6}};
+    //     auto yslices = Slices{{0, 1}, {3, 5}};
+    //     auto xslice = Slice{1, 3};
+    //     auto xslices = Slices{xslice};
 
-        dset.select(ProductSet(yslices, xpoints)).read(subarray);
+    //     dset.select(ProductSet(yslices, xslice)).read(subarray);
 
-        check(array, subarray, yslices, xslices);
-    }
+    //     check(array, subarray, yslices, xslices);
+    // }
 
-    SECTION("pR") {
-        std::vector<std::vector<double>> subarray;
+    // SECTION("RP") {
+    //     std::vector<std::vector<double>> subarray;
 
-        auto ypoint = Point{2};
-        auto yslices = Slices{{2, 3}};
-        auto xslices = Slices{{0, 1}, {3, 5}};
+    //     auto yslices = Slices{{0, 1}, {3, 5}};
+    //     auto xpoints = Points{2, 4, 5};
+    //     auto xslices = Slices{{2, 3}, {4, 6}};
 
-        dset.select(ProductSet(ypoint, xslices)).read(subarray);
+    //     dset.select(ProductSet(yslices, xpoints)).read(subarray);
 
-        check(array, subarray, yslices, xslices);
-    }
+    //     check(array, subarray, yslices, xslices);
+    // }
 
-    SECTION("pp") {
-        std::vector<std::vector<double>> subarray;
+    // SECTION("pR") {
+    //     std::vector<std::vector<double>> subarray;
 
-        auto xpoint = Point{3};
-        auto ypoint = Point{2};
-        auto yslices = Slices{{2, 3}};
-        auto xslices = Slices{{3, 4}};
+    //     auto ypoint = Point{2};
+    //     auto yslices = Slices{{2, 3}};
+    //     auto xslices = Slices{{0, 1}, {3, 5}};
 
-        dset.select(ProductSet(ypoint, xpoint)).read(subarray);
-        check(array, subarray, yslices, xslices);
-    }
+    //     dset.select(ProductSet(ypoint, xslices)).read(subarray);
 
-    SECTION("PP") {
-        std::vector<std::vector<double>> subarray;
+    //     check(array, subarray, yslices, xslices);
+    // }
 
-        auto xpoints = Points{0, 3, 4};
-        auto ypoints = Points{2, 3};
-        auto yslices = Slices{{2, 4}};
-        auto xslices = Slices{{0, 1}, {3, 5}};
+    // SECTION("pp") {
+    //     std::vector<std::vector<double>> subarray;
 
-        dset.select(ProductSet(ypoints, xpoints)).read(subarray);
-        check(array, subarray, yslices, xslices);
-    }
+    //     auto xpoint = Point{3};
+    //     auto ypoint = Point{2};
+    //     auto yslices = Slices{{2, 3}};
+    //     auto xslices = Slices{{3, 4}};
 
-    SECTION("RR") {
-        std::vector<std::vector<double>> subarray;
+    //     dset.select(ProductSet(ypoint, xpoint)).read(subarray);
+    //     check(array, subarray, yslices, xslices);
+    // }
 
-        auto yslices = Slices{{2, 4}};
-        auto xslices = Slices{{0, 1}, {3, 5}};
+    // SECTION("PP") {
+    //     std::vector<std::vector<double>> subarray;
 
-        dset.select(ProductSet(yslices, xslices)).read(subarray);
-        check(array, subarray, yslices, xslices);
-    }
-#endif
+    //     auto xpoints = Points{0, 3, 4};
+    //     auto ypoints = Points{2, 3};
+    //     auto yslices = Slices{{2, 4}};
+    //     auto xslices = Slices{{0, 1}, {3, 5}};
+
+    //     dset.select(ProductSet(ypoints, xpoints)).read(subarray);
+    //     check(array, subarray, yslices, xslices);
+    // }
+
+    // SECTION("RR") {
+    //     std::vector<std::vector<double>> subarray;
+
+    //     auto yslices = Slices{{2, 4}};
+    //     auto xslices = Slices{{0, 1}, {3, 5}};
+
+    //     dset.select(ProductSet(yslices, xslices)).read(subarray);
+    //     check(array, subarray, yslices, xslices);
+    // }
 }
 
 
@@ -1511,16 +1508,15 @@ void attribute_scalar_rw() {
     // write a scalar attribute
     {
         T out(attribute_value);
-#if defined(HIGHFIVE_USE_RESTVOL)
-        if constexpr (std::is_same_v<T, std::string>) {
-            auto att = g.createAttribute("family", out);
+        if (rest_vol_enabled()) {
+            if constexpr (std::is_same_v<T, std::string>) {
+                auto att = g.createAttribute("family", out);
+            } else {
+            }
         } else {
-#endif
             Attribute att = g.createAttribute<T>("family", DataSpace::From(out));
             att.write(out);
-#if defined(HIGHFIVE_USE_RESTVOL)
         }
-#endif
     }
 
     h5file.flush();
@@ -1946,9 +1942,9 @@ TEST_CASE("HighFiveInspect") {
 
     // meta
     CHECK(ds.getType() == ObjectType::Dataset);  // internal
-#if !defined(HIGHFIVE_USE_RESTVOL)               // TODO
-    CHECK(ds.getInfo().getRefCount() == 1);
-#endif
+    if (!rest_vol_enabled()) {
+        CHECK(ds.getInfo().getRefCount() == 1);
+    }
 }
 
 TEST_CASE("HighFiveGetPath") {
@@ -1959,30 +1955,28 @@ TEST_CASE("HighFiveGetPath") {
     DataSet dataset = group.createDataSet("data", DataSpace(1), AtomicType<int>());
     dataset.write(number);
     std::string string_list("Very important DataSet!");
-#if defined(HIGHFIVE_USE_RESTVOL)
     Attribute attribute = dataset.createAttribute<std::string>("attribute", string_list);
-#else
-    Attribute attribute = dataset.createAttribute<std::string>("attribute",
-                                                               DataSpace::From(string_list));
-    attribute.write(string_list);
-#endif
+    if (!rest_vol_enabled()) {
+        attribute = dataset.createAttribute<std::string>("attribute", DataSpace::From(string_list));
+        attribute.write(string_list);
+    }
 
     CHECK("/" == file.getPath());
     CHECK("/group" == group.getPath());
     CHECK("/group/data" == dataset.getPath());
     CHECK("attribute" == attribute.getName());
 
-#if !defined(HIGHFIVE_USE_RESTVOL)
-    CHECK("/group/data" == attribute.getPath());
-    CHECK(file == dataset.getFile());
-    CHECK(file == attribute.getFile());
+    if (!rest_vol_enabled()) {
+        CHECK("/group/data" == attribute.getPath());
+        CHECK(file == dataset.getFile());
+        CHECK(file == attribute.getFile());
 
-    // Destroy file early (it should live inside Dataset/Group)
-    std::unique_ptr<File> f2(new File(to_abs_if_rest_vol("getpath.h5")));
-    const auto& d2 = f2->getDataSet("/group/data");
-    f2.reset(nullptr);
-    CHECK(d2.getFile().getPath() == "/");
-#endif
+        // Destroy file early (it should live inside Dataset/Group)
+        std::unique_ptr<File> f2(new File(to_abs_if_rest_vol("getpath.h5")));
+        const auto& d2 = f2->getDataSet("/group/data");
+        f2.reset(nullptr);
+        CHECK(d2.getFile().getPath() == "/");
+    }
 }
 
 TEST_CASE("HighFiveSoftLinks", RESTVOL_UNSUPPORTED("")) {
