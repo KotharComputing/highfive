@@ -386,22 +386,24 @@ inline void SliceTraits<Derivate>::read_raw(T* array,
 
     const auto& slice = static_cast<const Derivate&>(*this);
 
-    hid_t file_space_id;
     if (rest_vol_enabled()) {
         const DataSpace& mem_space = slice.getMemSpace();
         auto dims = mem_space.getDimensions();
         const bool is_scalar = dims.empty() || (dims.size() == 1 && dims[0] == 1);
-        file_space_id = is_scalar ? H5S_ALL : slice.getSpace().getId();
+        detail::h5d_read(details::get_dataset(slice).getId(),
+                         mem_datatype.getId(),
+                         details::get_memspace_id(slice),
+                         is_scalar ? H5S_ALL : slice.getSpace().getId(),
+                         xfer_props.getId(),
+                         static_cast<void*>(array));
     } else {
-        file_space_id = slice.getSpace().getId();
+        detail::h5d_read(details::get_dataset(slice).getId(),
+                         mem_datatype.getId(),
+                         details::get_memspace_id(slice),
+                         slice.getSpace().getId(),
+                         xfer_props.getId(),
+                         static_cast<void*>(array));
     }
-
-    detail::h5d_read(details::get_dataset(slice).getId(),
-                     mem_datatype.getId(),
-                     details::get_memspace_id(slice),
-                     file_space_id,
-                     xfer_props.getId(),
-                     static_cast<void*>(array));
 }
 
 
@@ -448,22 +450,25 @@ inline void SliceTraits<Derivate>::write_raw(const T* buffer,
                                              const DataTransferProps& xfer_props) {
     const auto& slice = static_cast<const Derivate&>(*this);
 
-    hid_t file_space_id;
     if (rest_vol_enabled()) {
         const DataSpace& mem_space = slice.getMemSpace();
         auto dims = mem_space.getDimensions();
         const bool is_scalar = dims.empty() || (dims.size() == 1 && dims[0] == 1);
-        file_space_id = is_scalar ? H5S_ALL : slice.getSpace().getId();
+        detail::h5d_write(details::get_dataset(slice).getId(),
+                          mem_datatype.getId(),
+                          details::get_memspace_id(slice),
+                          is_scalar ? H5S_ALL : slice.getSpace().getId(),
+                          xfer_props.getId(),
+                          static_cast<const void*>(buffer));
     } else {
         file_space_id = slice.getSpace().getId();
+        detail::h5d_write(details::get_dataset(slice).getId(),
+                          mem_datatype.getId(),
+                          details::get_memspace_id(slice),
+                          slice.getSpace().getId(),
+                          xfer_props.getId(),
+                          static_cast<const void*>(buffer));
     }
-
-    detail::h5d_write(details::get_dataset(slice).getId(),
-                      mem_datatype.getId(),
-                      details::get_memspace_id(slice),
-                      file_space_id,
-                      xfer_props.getId(),
-                      static_cast<const void*>(buffer));
 }
 
 
