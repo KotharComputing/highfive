@@ -461,7 +461,6 @@ inline void SliceTraits<Derivate>::write_raw(const T* buffer,
                           xfer_props.getId(),
                           static_cast<const void*>(buffer));
     } else {
-        file_space_id = slice.getSpace().getId();
         detail::h5d_write(details::get_dataset(slice).getId(),
                           mem_datatype.getId(),
                           details::get_memspace_id(slice),
