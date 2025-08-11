@@ -50,9 +50,14 @@ inline File::File(const std::string& filename,
                   const FileAccessProps& fileAccessProps) {
     if (rest_vol_enabled()) {
         if (!std::filesystem::path(filename).is_absolute()) {
-            throw FileException("The provided path must be absolute.");
+            _filename = "/" + filename;
+        } else {
+            _filename = filename;
         }
+    } else {
+        _filename = filename;
     }
+
     unsigned openFlags = convert_open_flag(access_mode);
 
     unsigned createMode = openFlags & (H5F_ACC_TRUNC | H5F_ACC_EXCL);
@@ -60,31 +65,27 @@ inline File::File(const std::string& filename,
     bool mustCreate = createMode > 0;
     bool openOrCreate = (openFlags & H5F_ACC_CREAT) > 0;
 
-    // open is default. It's skipped only if flags require creation
-    // If open fails it will try create() if H5F_ACC_CREAT is set
     if (!mustCreate) {
-        // Silence open errors if create is allowed
         std::unique_ptr<SilenceHDF5> silencer;
         if (openOrCreate)
             silencer.reset(new SilenceHDF5());
 
-        _hid = detail::nothrow::h5f_open(filename.c_str(), openMode, fileAccessProps.getId());
+        _hid = detail::nothrow::h5f_open(_filename.c_str(), openMode, fileAccessProps.getId());
 
         if (isValid())
-            return;  // Done
+            return;
 
         if (openOrCreate) {
-            // Will attempt to create ensuring wont clobber any file
             createMode = H5F_ACC_EXCL;
         } else {
             HDF5ErrMapper::ToException<FileException>(
-                std::string("Unable to open file " + filename));
+                std::string("Unable to open file " + _filename));
         }
     }
 
     auto fcpl = fileCreateProps.getId();
     auto fapl = fileAccessProps.getId();
-    _hid = detail::h5f_create(filename.c_str(), createMode, fcpl, fapl);
+    _hid = detail::h5f_create(_filename.c_str(), createMode, fcpl, fapl);
 }
 
 inline const std::string& File::getName() const {

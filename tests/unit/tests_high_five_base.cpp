@@ -51,7 +51,11 @@ TEST_CASE("Basic HighFive tests") {
     // Create a new file using the default property lists.
     File file(file_name, File::ReadWrite | File::Create | File::Truncate);
 
-    CHECK(file.getName() == file_name);
+    if (rest_vol_enabled()) {
+        CHECK(file.getName() == "/" + file_name);
+    } else {
+        CHECK(file.getName() == file_name);
+    }
 
     // Create the data space for the dataset.
     std::vector<size_t> dims{4, 6};
