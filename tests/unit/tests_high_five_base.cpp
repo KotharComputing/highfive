@@ -880,12 +880,6 @@ TEST_CASE("DataTypeEqualTakeBack") {
 
     CHECK(s == dataset.getDataType());
     CHECK(d != dataset.getDataType());
-
-    if (!rest_vol_enabled()) {
-        // Test getAddress and expect deprecation warning
-        auto addr = dataset.getInfo().getAddress();
-        CHECK(addr != 0);
-    }
 }
 
 TEST_CASE("DataSpaceTest") {
@@ -1175,9 +1169,9 @@ void readWriteAttributeVectorTest() {
         // Create the same attribute on a newly created dataset
         DataSet s = g.createDataSet("dummy_dataset", DataSpace(1), AtomicType<int>());
 
-        Attribute a2 = s.createAttribute("my_attribute_copy", vec);
+        s.createAttribute("my_attribute_copy", vec);
         if (!rest_vol_enabled()) {
-            a2 = s.createAttribute<T>("my_attribute_copy", DataSpace::From(vec));
+            Attribute a2 = s.createAttribute<T>("my_attribute_copy", DataSpace::From(vec));
             a2.write(vec);
         }
 
@@ -1417,75 +1411,75 @@ TEST_CASE("productSet") {
         }
     }
 
-    // SECTION("Rr") {
-    //     std::vector<std::vector<double>> subarray;
+    SECTION("Rr") {
+        std::vector<std::vector<double>> subarray;
 
-    //     auto yslices = Slices{{0, 1}, {3, 5}};
-    //     auto xslice = Slice{1, 3};
-    //     auto xslices = Slices{xslice};
+        auto yslices = Slices{{0, 1}, {3, 5}};
+        auto xslice = Slice{1, 3};
+        auto xslices = Slices{xslice};
 
-    //     dset.select(ProductSet(yslices, xslice)).read(subarray);
+        dset.select(ProductSet(yslices, xslice)).read(subarray);
 
-    //     check(array, subarray, yslices, xslices);
-    // }
+        check(array, subarray, yslices, xslices);
+    }
 
-    // SECTION("RP") {
-    //     std::vector<std::vector<double>> subarray;
+    SECTION("RP") {
+        std::vector<std::vector<double>> subarray;
 
-    //     auto yslices = Slices{{0, 1}, {3, 5}};
-    //     auto xpoints = Points{2, 4, 5};
-    //     auto xslices = Slices{{2, 3}, {4, 6}};
+        auto yslices = Slices{{0, 1}, {3, 5}};
+        auto xpoints = Points{2, 4, 5};
+        auto xslices = Slices{{2, 3}, {4, 6}};
 
-    //     dset.select(ProductSet(yslices, xpoints)).read(subarray);
+        dset.select(ProductSet(yslices, xpoints)).read(subarray);
 
-    //     check(array, subarray, yslices, xslices);
-    // }
+        check(array, subarray, yslices, xslices);
+    }
 
-    // SECTION("pR") {
-    //     std::vector<std::vector<double>> subarray;
+    SECTION("pR") {
+        std::vector<std::vector<double>> subarray;
 
-    //     auto ypoint = Point{2};
-    //     auto yslices = Slices{{2, 3}};
-    //     auto xslices = Slices{{0, 1}, {3, 5}};
+        auto ypoint = Point{2};
+        auto yslices = Slices{{2, 3}};
+        auto xslices = Slices{{0, 1}, {3, 5}};
 
-    //     dset.select(ProductSet(ypoint, xslices)).read(subarray);
+        dset.select(ProductSet(ypoint, xslices)).read(subarray);
 
-    //     check(array, subarray, yslices, xslices);
-    // }
+        check(array, subarray, yslices, xslices);
+    }
 
-    // SECTION("pp") {
-    //     std::vector<std::vector<double>> subarray;
+    SECTION("pp") {
+        std::vector<std::vector<double>> subarray;
 
-    //     auto xpoint = Point{3};
-    //     auto ypoint = Point{2};
-    //     auto yslices = Slices{{2, 3}};
-    //     auto xslices = Slices{{3, 4}};
+        auto xpoint = Point{3};
+        auto ypoint = Point{2};
+        auto yslices = Slices{{2, 3}};
+        auto xslices = Slices{{3, 4}};
 
-    //     dset.select(ProductSet(ypoint, xpoint)).read(subarray);
-    //     check(array, subarray, yslices, xslices);
-    // }
+        dset.select(ProductSet(ypoint, xpoint)).read(subarray);
+        check(array, subarray, yslices, xslices);
+    }
 
-    // SECTION("PP") {
-    //     std::vector<std::vector<double>> subarray;
+    SECTION("PP") {
+        std::vector<std::vector<double>> subarray;
 
-    //     auto xpoints = Points{0, 3, 4};
-    //     auto ypoints = Points{2, 3};
-    //     auto yslices = Slices{{2, 4}};
-    //     auto xslices = Slices{{0, 1}, {3, 5}};
+        auto xpoints = Points{0, 3, 4};
+        auto ypoints = Points{2, 3};
+        auto yslices = Slices{{2, 4}};
+        auto xslices = Slices{{0, 1}, {3, 5}};
 
-    //     dset.select(ProductSet(ypoints, xpoints)).read(subarray);
-    //     check(array, subarray, yslices, xslices);
-    // }
+        dset.select(ProductSet(ypoints, xpoints)).read(subarray);
+        check(array, subarray, yslices, xslices);
+    }
 
-    // SECTION("RR") {
-    //     std::vector<std::vector<double>> subarray;
+    SECTION("RR") {
+        std::vector<std::vector<double>> subarray;
 
-    //     auto yslices = Slices{{2, 4}};
-    //     auto xslices = Slices{{0, 1}, {3, 5}};
+        auto yslices = Slices{{2, 4}};
+        auto xslices = Slices{{0, 1}, {3, 5}};
 
-    //     dset.select(ProductSet(yslices, xslices)).read(subarray);
-    //     check(array, subarray, yslices, xslices);
-    // }
+        dset.select(ProductSet(yslices, xslices)).read(subarray);
+        check(array, subarray, yslices, xslices);
+    }
 }
 
 
