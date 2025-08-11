@@ -33,7 +33,6 @@ TEMPLATE_TEST_CASE("Scalar in DataSet", "[Types]", bool, std::string) {
         // Create a new file using the default property lists.
         File file(file_name, File::ReadWrite | File::Create | File::Truncate);
 
-        DataSet dataset;
         if (rest_vol_enabled()) {
             DataSet dataset = file.createDataSet(dataset_name, t1);
         } else {

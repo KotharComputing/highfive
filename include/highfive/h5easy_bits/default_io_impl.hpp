@@ -28,7 +28,6 @@ struct default_io_impl {
                                const T& data,
                                const DumpOptions& options) {
         using value_type = typename inspector<T>::base_type;
-        DataSet dataset;
         if (HighFive::rest_vol_enabled()) {
             if constexpr (std::is_same_v<T, std::string>) {
                 if (file.exist(path) && !options.overwrite()) {
@@ -37,15 +36,12 @@ struct default_io_impl {
                 if (file.exist(path)) {
                     file.unlink(path);
                 }
-                dataset = file.createDataSet(path, data);
-            } else {
-                dataset = initDataset<value_type>(file, path, shape(data), options);
-                dataset.write(data);
+                return file.createDataSet(path, data);
             }
-        } else {
-            dataset = initDataset<value_type>(file, path, shape(data), options);
-            dataset.write(data);
         }
+
+        DataSet dataset = initDataset<value_type>(file, path, shape(data), options);
+        dataset.write(data);
         if (options.flush()) {
             file.flush();
         }
