@@ -146,7 +146,7 @@ jobs:
         os: [ "ubuntu-24.04" ]
         env: [
           {CC: clang-19, CXX: clang++-19, pkgs: "clang-19"},
-          {CC: gcc-14, CXX: g++-17, pkgs: "gcc-14 g++-17"},
+          {CC: gcc-14, CXX: g++-14, pkgs: "gcc-14 g++-14"},
         ]
 
 
