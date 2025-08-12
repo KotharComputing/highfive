@@ -90,6 +90,7 @@ inline void Attribute::read(T& array) const {
 
     auto r = details::data_converter::get_reader<T>(dims, array, file_datatype);
     read_raw(r.getPointer(), buffer_info.data_type);
+    // re-arrange results
     r.unserialize(array);
 
     auto t = buffer_info.data_type;
@@ -97,8 +98,10 @@ inline void Attribute::read(T& array) const {
 
     if (c == DataTypeClass::VarLen || t.isVariableStr()) {
 #if H5_VERSION_GE(1, 12, 0)
+        // This one have been created in 1.12.0
         (void) detail::h5t_reclaim(t.getId(), mem_space.getId(), H5P_DEFAULT, r.getPointer());
 #else
+        // This one is deprecated since 1.12.0
         (void) detail::h5d_vlen_reclaim(t.getId(), mem_space.getId(), H5P_DEFAULT, r.getPointer());
 #endif
     }
