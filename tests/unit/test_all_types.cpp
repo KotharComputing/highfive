@@ -24,8 +24,7 @@ using namespace HighFive;
 
 #if HIGHFIVE_CXX_STD >= 20
 TEMPLATE_TEST_CASE("Scalar in DataSet", "[Types]", bool, std::string) {
-    const std::string file_name(to_abs_if_rest_vol("rw_dataset_") + typeNameHelper<TestType>() +
-                                ".h5");
+    const std::string file_name("rw_dataset_" + typeNameHelper<TestType>() + ".h5");
     const std::string dataset_name("dset");
     TestType t1{};
 
@@ -54,16 +53,12 @@ TEMPLATE_TEST_CASE("Scalar in DataSet", "[Types]", bool, std::string) {
         TestType value;
         DataSet dataset = file.getDataSet("/" + dataset_name);
         dataset.read(value);
-        CHECK(t1 == trim_if_rest_vol(value));
+        CHECK(t1 == value);
     }
 }
 
-TEMPLATE_PRODUCT_TEST_CASE("Scalar in std::vector<std::byte>",
-                           RESTVOL_DISABLED("[Types]"),
-                           std::vector,
-                           std::byte) {
-    const std::string file_name(to_abs_if_rest_vol("rw_dataset_vector_") +
-                                typeNameHelper<TestType>() + ".h5");
+TEMPLATE_PRODUCT_TEST_CASE("Scalar in std::vector<std::byte>", "[Types]", std::vector, std::byte) {
+    const std::string file_name("rw_dataset_vector_" + typeNameHelper<TestType>() + ".h5");
     const std::string dataset_name("dset");
     TestType t1(5, std::byte(0xCD));
 

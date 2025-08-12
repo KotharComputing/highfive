@@ -238,15 +238,17 @@ struct StringBuffer {
                 len = buffer.string_max_length;
             }
 
-            // --- Trim trailing padding characters ---
-            if (buffer.padding == StringPadding::SpacePadded) {
-                while (len > 0 && data()[len - 1] == ' ') {
-                    --len;
-                }
-            } else if (buffer.padding == StringPadding::NullPadded ||
-                       buffer.padding == StringPadding::NullTerminated) {
-                while (len > 0 && data()[len - 1] == '\0') {
-                    --len;
+            if (rest_vol_enabled()) {
+                // --- Trim trailing padding characters ---
+                if (buffer.padding == StringPadding::SpacePadded) {
+                    while (len > 0 && data()[len - 1] == ' ') {
+                        --len;
+                    }
+                } else if (buffer.padding == StringPadding::NullPadded ||
+                           buffer.padding == StringPadding::NullTerminated) {
+                    while (len > 0 && data()[len - 1] == '\0') {
+                        --len;
+                    }
                 }
             }
             return len;

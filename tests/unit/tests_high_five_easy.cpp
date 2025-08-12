@@ -222,7 +222,7 @@ TEST_CASE("H5Easy_Attribute_scalar") {
 
 #ifdef HIGHFIVE_TEST_XTENSOR
 TEST_CASE("H5Easy_extend1d") {
-    H5Easy::File file(to_abs_if_rest_vol("h5easy_extend1d.h5"), H5Easy::File::Overwrite);
+    H5Easy::File file("h5easy_extend1d.h5", H5Easy::File::Overwrite);
 
     for (size_t i = 0; i < 10; ++i) {
         H5Easy::dump(file, "/path/to/A", i, {i});
@@ -239,7 +239,7 @@ TEST_CASE("H5Easy_extend1d") {
 }
 
 TEST_CASE("H5Easy_extend2d") {
-    H5Easy::File file(to_abs_if_rest_vol("h5easy_extend2d.h5"), H5Easy::File::Overwrite);
+    H5Easy::File file("h5easy_extend2d.h5", H5Easy::File::Overwrite);
 
     for (size_t i = 0; i < 10; ++i) {
         for (size_t j = 0; j < 5; ++j) {
@@ -260,7 +260,7 @@ TEST_CASE("H5Easy_extend2d") {
 }
 
 TEST_CASE("H5Easy_xtensor") {
-    H5Easy::File file(to_abs_if_rest_vol("h5easy_xtensor.h5"), H5Easy::File::Overwrite);
+    H5Easy::File file("h5easy_xtensor.h5", H5Easy::File::Overwrite);
 
     xt::xtensor<double, 2> A = 100. * xt::random::randn<double>({20, 5});
     xt::xtensor<int, 2> B = A;
@@ -276,7 +276,7 @@ TEST_CASE("H5Easy_xtensor") {
 }
 
 TEST_CASE("H5Easy_xtensor_column_major") {
-    H5Easy::File file(to_abs_if_rest_vol("h5easy_xtensor_colum_major.h5"), H5Easy::File::Overwrite);
+    H5Easy::File file("h5easy_xtensor_colum_major.h5", H5Easy::File::Overwrite);
 
     using column_major_t = xt::xtensor<double, 2, xt::layout_type::column_major>;
 
@@ -297,7 +297,7 @@ TEST_CASE("H5Easy_xtensor_column_major") {
 }
 
 TEST_CASE("H5Easy_xarray_column_major") {
-    H5Easy::File file(to_abs_if_rest_vol("h5easy_xarray_colum_major.h5"), H5Easy::File::Overwrite);
+    H5Easy::File file("h5easy_xarray_colum_major.h5", H5Easy::File::Overwrite);
 
     using column_major_t = xt::xarray<double, xt::layout_type::column_major>;
 
@@ -318,7 +318,7 @@ TEST_CASE("H5Easy_xarray_column_major") {
 }
 
 TEST_CASE("H5Easy_xarray") {
-    H5Easy::File file(to_abs_if_rest_vol("h5easy_xarray.h5"), H5Easy::File::Overwrite);
+    H5Easy::File file("h5easy_xarray.h5", H5Easy::File::Overwrite);
 
     xt::xarray<double> A = 100. * xt::random::randn<double>({20, 5});
     xt::xarray<int> B = A;
@@ -334,7 +334,7 @@ TEST_CASE("H5Easy_xarray") {
 }
 
 TEST_CASE("H5Easy_view") {
-    H5Easy::File file(to_abs_if_rest_vol("h5easy_view.h5"), H5Easy::File::Overwrite);
+    H5Easy::File file("h5easy_view.h5", H5Easy::File::Overwrite);
 
     xt::xtensor<double, 2> A = 100. * xt::random::randn<double>({20, 5});
     auto a = xt::view(A, xt::range(0, 10), xt::range(0, 10));
@@ -347,7 +347,7 @@ TEST_CASE("H5Easy_view") {
 }
 
 TEST_CASE("H5Easy_xtensor_compress") {
-    H5Easy::File file(to_abs_if_rest_vol("h5easy_xtensor_compress.h5"), H5Easy::File::Overwrite);
+    H5Easy::File file("h5easy_xtensor_compress.h5", H5Easy::File::Overwrite);
 
     xt::xtensor<double, 2> A = 100. * xt::random::randn<double>({20, 5});
     xt::xtensor<int, 2> B = A;
@@ -369,7 +369,7 @@ TEST_CASE("H5Easy_xtensor_compress") {
 }
 
 TEST_CASE("H5Easy_Attribute_xtensor") {
-    H5Easy::File file(to_abs_if_rest_vol("h5easy_attribute_xtensor.h5"), H5Easy::File::Overwrite);
+    H5Easy::File file("h5easy_attribute_xtensor.h5", H5Easy::File::Overwrite);
 
     xt::xtensor<double, 2> A = 100. * xt::random::randn<double>({20, 5});
     xt::xtensor<int, 2> B = A;
@@ -389,7 +389,7 @@ TEST_CASE("H5Easy_Attribute_xtensor") {
 
 #ifdef HIGHFIVE_TEST_EIGEN
 TEST_CASE("H5Easy_Eigen_MatrixX") {
-    H5Easy::File file(to_abs_if_rest_vol("h5easy_eigen_MatrixX.h5"), H5Easy::File::Overwrite);
+    H5Easy::File file("h5easy_eigen_MatrixX.h5", H5Easy::File::Overwrite);
 
     Eigen::MatrixXd A = 100. * Eigen::MatrixXd::Random(20, 5);
     Eigen::MatrixXi B = A.cast<int>();
@@ -405,7 +405,7 @@ TEST_CASE("H5Easy_Eigen_MatrixX") {
 }
 
 TEST_CASE("H5Easy_Eigen_ArrayXX") {
-    H5Easy::File file(to_abs_if_rest_vol("h5easy_eigen_ArrayXX.h5"), H5Easy::File::Overwrite);
+    H5Easy::File file("h5easy_eigen_ArrayXX.h5", H5Easy::File::Overwrite);
 
     Eigen::ArrayXXf A = 100. * Eigen::ArrayXXf::Random(20, 5);
     Eigen::ArrayXXi B = A.cast<int>();
@@ -421,7 +421,7 @@ TEST_CASE("H5Easy_Eigen_ArrayXX") {
 }
 
 TEST_CASE("H5Easy_Eigen_ArrayX") {
-    H5Easy::File file(to_abs_if_rest_vol("h5easy_eigen_ArrayX.h5"), H5Easy::File::Overwrite);
+    H5Easy::File file("h5easy_eigen_ArrayX.h5", H5Easy::File::Overwrite);
 
     Eigen::ArrayXf A = Eigen::ArrayXf::Random(50);
     Eigen::ArrayXi B = A.cast<int>();
@@ -438,7 +438,7 @@ TEST_CASE("H5Easy_Eigen_ArrayX") {
 
 
 TEST_CASE("H5Easy_Eigen_VectorX") {
-    H5Easy::File file(to_abs_if_rest_vol("h5easy_eigen_VectorX.h5"), H5Easy::File::Overwrite);
+    H5Easy::File file("h5easy_eigen_VectorX.h5", H5Easy::File::Overwrite);
 
     Eigen::VectorXd A = 100. * Eigen::VectorXd::Random(20);
     Eigen::VectorXi B = A.cast<int>();
@@ -457,8 +457,7 @@ TEST_CASE("H5Easy_Eigen_MatrixXRowMajor") {
     typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> MatrixXd;
     typedef Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> MatrixXi;
 
-    H5Easy::File file(to_abs_if_rest_vol("H5Easy_Eigen_MatrixXRowMajor.h5"),
-                      H5Easy::File::Overwrite);
+    H5Easy::File file("H5Easy_Eigen_MatrixXRowMajor.h5", H5Easy::File::Overwrite);
 
     MatrixXd A = 100. * MatrixXd::Random(20, 5);
     MatrixXi B = A.cast<int>();
@@ -477,8 +476,7 @@ TEST_CASE("H5Easy_Eigen_VectorXRowMajor") {
     typedef Eigen::Matrix<double, 1, Eigen::Dynamic, Eigen::RowMajor> VectorXd;
     typedef Eigen::Matrix<int, 1, Eigen::Dynamic, Eigen::RowMajor> VectorXi;
 
-    H5Easy::File file(to_abs_if_rest_vol("h5easy_eigen_VectorXRowMajor.h5"),
-                      H5Easy::File::Overwrite);
+    H5Easy::File file("h5easy_eigen_VectorXRowMajor.h5", H5Easy::File::Overwrite);
 
     VectorXd A = 100. * VectorXd::Random(20);
     VectorXi B = A.cast<int>();
@@ -494,7 +492,7 @@ TEST_CASE("H5Easy_Eigen_VectorXRowMajor") {
 }
 
 TEST_CASE("H5Easy_Eigen_Map") {
-    H5Easy::File file(to_abs_if_rest_vol("h5easy_eigen_Map.h5"), H5Easy::File::Overwrite);
+    H5Easy::File file("h5easy_eigen_Map.h5", H5Easy::File::Overwrite);
 
     std::vector<int> A = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     Eigen::Map<Eigen::VectorXi> mapped_vector(A.data(), static_cast<int>(A.size()));
@@ -507,8 +505,7 @@ TEST_CASE("H5Easy_Eigen_Map") {
 }
 
 TEST_CASE("H5Easy_Attribute_Eigen_MatrixX") {
-    H5Easy::File file(to_abs_if_rest_vol("h5easy_attribute_eigen_MatrixX.h5"),
-                      H5Easy::File::Overwrite);
+    H5Easy::File file("h5easy_attribute_eigen_MatrixX.h5", H5Easy::File::Overwrite);
 
     Eigen::MatrixXd A = 100. * Eigen::MatrixXd::Random(20, 5);
     Eigen::MatrixXi B = A.cast<int>();
@@ -527,7 +524,7 @@ TEST_CASE("H5Easy_Attribute_Eigen_MatrixX") {
 
 #ifdef HIGHFIVE_TEST_OPENCV
 TEST_CASE("H5Easy_OpenCV_Mat_") {
-    H5Easy::File file(to_abs_if_rest_vol("h5easy_opencv_Mat_.h5"), H5Easy::File::Overwrite);
+    H5Easy::File file("h5easy_opencv_Mat_.h5", H5Easy::File::Overwrite);
 
     using T = typename cv::Mat_<double>;
 
