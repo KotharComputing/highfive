@@ -213,7 +213,10 @@ void delete_file_if_exists(const std::string& name) {
             _name = "/" + name;
         }
         std::string command = "hsrm " + _name;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Werror=unused-result"
         system(command.c_str());
+#pragma GCC diagnostic pop
     } else {
         std::remove(name.c_str());
     }
