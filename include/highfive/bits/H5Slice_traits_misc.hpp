@@ -14,6 +14,7 @@
 #include <numeric>
 #include <sstream>
 #include <string>
+#include <numeric>
 
 #include "h5d_wrapper.hpp"
 #include "h5s_wrapper.hpp"
@@ -381,20 +382,17 @@ template <typename T>
 inline void SliceTraits<Derivate>::read_raw(T* buffer,
                                             const DataType& mem_datatype,
                                             const DataTransferProps& xfer_props) const {
+    static_assert(!std::is_const<T>::value,
+                  "read() requires a non-const structure to read data into");
+
     const auto& slice = static_cast<const Derivate&>(*this);
 
     if (rest_vol_enabled()) {
         const DataSpace& mem_space = slice.getMemSpace();
         auto dims = mem_space.getDimensions();
 
-        std::uint64_t num_elements = 1;
-        for (auto d: dims) {
-            if (d == 0) {
-                num_elements = 0;
-                break;
-            }
-            num_elements *= d;
-        }
+        std::uint64_t num_elements =
+            std::accumulate(dims.begin(), dims.end(), 1ul, std::multiplies<std::uint64_t>());
 
         // Skip read entirely if there are zero elements — avoids NULL buffer error
         if (num_elements == 0) {
@@ -467,14 +465,8 @@ inline void SliceTraits<Derivate>::write_raw(const T* buffer,
         auto dims = mem_space.getDimensions();
 
         // Compute element count for the REST VOL path
-        std::uint64_t num_elements = 1;
-        for (auto d: dims) {
-            if (d == 0) {
-                num_elements = 0;
-                break;
-            }
-            num_elements *= d;
-        }
+        std::uint64_t num_elements =
+            std::accumulate(dims.begin(), dims.end(), 1ul, std::multiplies<std::uint64_t>());
 
         // Skip write entirely if there are zero elements — avoids NULL buffer error
         if (num_elements == 0) {
