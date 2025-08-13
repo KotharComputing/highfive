@@ -24,8 +24,7 @@ using namespace HighFive;
 
 #if HIGHFIVE_CXX_STD >= 20
 TEMPLATE_TEST_CASE("Scalar in DataSet", "[Types]", bool, std::string) {
-    const std::string file_name(to_abs_if_rest_vol("rw_dataset_") + typeNameHelper<TestType>() +
-                                ".h5");
+    const std::string file_name("rw_dataset_" + typeNameHelper<TestType>() + ".h5");
     const std::string dataset_name("dset");
     TestType t1{};
 
@@ -54,16 +53,12 @@ TEMPLATE_TEST_CASE("Scalar in DataSet", "[Types]", bool, std::string) {
         TestType value;
         DataSet dataset = file.getDataSet("/" + dataset_name);
         dataset.read(value);
-        CHECK(t1 == trim_if_rest_vol(value));
+        CHECK(t1 == value);
     }
 }
 
-TEMPLATE_PRODUCT_TEST_CASE("Scalar in std::vector<std::byte>",
-                           RESTVOL_DISABLED("[Types]"),
-                           std::vector,
-                           std::byte) {
-    const std::string file_name(to_abs_if_rest_vol("rw_dataset_vector_") +
-                                typeNameHelper<TestType>() + ".h5");
+TEMPLATE_PRODUCT_TEST_CASE("Scalar in std::vector<std::byte>", "[Types]", std::vector, std::byte) {
+    const std::string file_name("rw_dataset_vector_" + typeNameHelper<TestType>() + ".h5");
     const std::string dataset_name("dset");
     TestType t1(5, std::byte(0xCD));
 
@@ -159,8 +154,7 @@ void check_read_regular(const std::string& file_name, const std::vector<size_t>&
 
 template <class Container>
 void check_read_regular() {
-    const std::string file_name(to_abs_if_rest_vol("rw_read_regular") +
-                                typeNameHelper<Container>() + ".h5");
+    const std::string file_name("rw_read_regular" + typeNameHelper<Container>() + ".h5");
     auto dims = testing::DataGenerator<Container>::default_dims();
 
     check_read_regular<Container>(file_name, dims);
@@ -184,7 +178,7 @@ void check_writing(const std::vector<size_t>& dims, Write write) {
     auto actual = testing::DataGenerator<reference_type>::allocate(dims);
     obj.read(actual);
 
-    testing::compare_arrays(trim_if_rest_vol(actual), expected, dims);
+    testing::compare_arrays(actual, expected, dims);
 
     testing::ContainerTraits<reference_type>::deallocate(actual, dims);
     testing::ContainerTraits<Container>::deallocate(values, dims);
@@ -271,8 +265,7 @@ void check_write_regular(const std::string& file_name, const std::vector<size_t>
 
 template <class Container>
 void check_write_regular() {
-    std::string file_name(to_abs_if_rest_vol("rw_write_regular") + typeNameHelper<Container>() +
-                          ".h5");
+    std::string file_name("rw_write_regular" + typeNameHelper<Container>() + ".h5");
     auto dims = testing::DataGenerator<Container>::default_dims();
     check_write_regular<Container>(file_name, dims);
 }

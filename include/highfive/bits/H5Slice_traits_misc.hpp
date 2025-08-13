@@ -14,6 +14,7 @@
 #include <numeric>
 #include <sstream>
 #include <string>
+#include <numeric>
 
 #include "h5d_wrapper.hpp"
 #include "h5s_wrapper.hpp"
@@ -378,7 +379,7 @@ inline void SliceTraits<Derivate>::read(T& array, const DataTransferProps& xfer_
 
 template <typename Derivate>
 template <typename T>
-inline void SliceTraits<Derivate>::read_raw(T* array,
+inline void SliceTraits<Derivate>::read_raw(T* buffer,
                                             const DataType& mem_datatype,
                                             const DataTransferProps& xfer_props) const {
     static_assert(!std::is_const<T>::value,
@@ -389,20 +390,29 @@ inline void SliceTraits<Derivate>::read_raw(T* array,
     if (rest_vol_enabled()) {
         const DataSpace& mem_space = slice.getMemSpace();
         auto dims = mem_space.getDimensions();
+
+        std::uint64_t num_elements =
+            std::accumulate(dims.begin(), dims.end(), 1ul, std::multiplies<std::uint64_t>());
+
+        // Skip read entirely if there are zero elements — avoids NULL buffer error
+        if (num_elements == 0) {
+            return;
+        }
+
         const bool is_scalar = dims.empty() || (dims.size() == 1 && dims[0] == 1);
         detail::h5d_read(details::get_dataset(slice).getId(),
                          mem_datatype.getId(),
                          details::get_memspace_id(slice),
                          is_scalar ? H5S_ALL : slice.getSpace().getId(),
                          xfer_props.getId(),
-                         static_cast<void*>(array));
+                         static_cast<void*>(buffer));
     } else {
         detail::h5d_read(details::get_dataset(slice).getId(),
                          mem_datatype.getId(),
                          details::get_memspace_id(slice),
                          slice.getSpace().getId(),
                          xfer_props.getId(),
-                         static_cast<void*>(array));
+                         static_cast<void*>(buffer));
     }
 }
 
@@ -453,6 +463,16 @@ inline void SliceTraits<Derivate>::write_raw(const T* buffer,
     if (rest_vol_enabled()) {
         const DataSpace& mem_space = slice.getMemSpace();
         auto dims = mem_space.getDimensions();
+
+        // Compute element count for the REST VOL path
+        std::uint64_t num_elements =
+            std::accumulate(dims.begin(), dims.end(), 1ul, std::multiplies<std::uint64_t>());
+
+        // Skip write entirely if there are zero elements — avoids NULL buffer error
+        if (num_elements == 0) {
+            return;
+        }
+
         const bool is_scalar = dims.empty() || (dims.size() == 1 && dims[0] == 1);
         detail::h5d_write(details::get_dataset(slice).getId(),
                           mem_datatype.getId(),

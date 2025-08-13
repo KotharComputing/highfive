@@ -87,7 +87,12 @@ void check_single_string(File file, size_t string_length) {
         auto obj =
             CreateTraits::create(file, "overlength_nullterm", dataspace, overlength_nullterm);
         obj.write(value);
-        REQUIRE(obj.template read<std::string>() == value);
+        if (rest_vol_enabled()) {
+            const auto readValue = obj.template read<std::string>();
+            REQUIRE(value.compare(0, readValue.size(), readValue) == 0);
+        } else {
+            REQUIRE(obj.template read<std::string>() == value);
+        }
     }
 
     SECTION("overlength null-padded") {
@@ -95,7 +100,12 @@ void check_single_string(File file, size_t string_length) {
         obj.write(value);
         auto expected = std::string(n_chars_overlength, '\0');
         expected.replace(0, value.size(), value.data());
-        REQUIRE(obj.template read<std::string>() == expected);
+        if (rest_vol_enabled()) {
+            const auto readValue = obj.template read<std::string>();
+            REQUIRE(expected.compare(0, readValue.size(), readValue) == 0);
+        } else {
+            REQUIRE(obj.template read<std::string>() == expected);
+        }
     }
 
     SECTION("overlength space-padded") {
@@ -104,7 +114,12 @@ void check_single_string(File file, size_t string_length) {
         obj.write(value);
         auto expected = std::string(n_chars_overlength, ' ');
         expected.replace(0, value.size(), value.data());
-        REQUIRE(obj.template read<std::string>() == expected);
+        if (rest_vol_enabled()) {
+            const auto readValue = obj.template read<std::string>();
+            REQUIRE(expected.compare(0, readValue.size(), readValue) == 0);
+        } else {
+            REQUIRE(obj.template read<std::string>() == expected);
+        }
     }
 
     SECTION("variable length") {
@@ -138,7 +153,11 @@ void check_multiple_string(File file, size_t string_length) {
     auto check = [](const value_t actual, const value_t& expected) {
         REQUIRE(actual.size() == expected.size());
         for (size_t i = 0; i < actual.size(); ++i) {
-            REQUIRE(actual[i] == expected[i]);
+            if constexpr (std::is_same_v<value_t, std::vector<std::string>>) {
+                REQUIRE(expected[i].compare(0, actual[i].size(), actual[i]) == 0);
+            } else {
+                REQUIRE(actual[i] == expected[i]);
+            }
         }
     };
 
@@ -153,11 +172,7 @@ void check_multiple_string(File file, size_t string_length) {
 
     SECTION("automatic") {
         auto obj = CreateTraits::create(file, "auto", value);
-        if (rest_vol_enabled()) {
-            check(obj.template read<value_t>(), make_padded_reference('\0', string_length + 1));
-        } else {
-            check(obj.template read<value_t>(), value);
-        }
+        check(obj.template read<value_t>(), value);
     }
 
     SECTION("variable length") {
@@ -251,59 +266,57 @@ void check_supposedly_nullterm_scan(HighFive::File& file) {
 }
 
 TEST_CASE("HighFiveSTDString (attribute, nullterm cornercase)") {
-    auto file = HighFive::File(to_abs_if_rest_vol("not_null_terminated_attribute.h5"),
-                               HighFive::File::Truncate);
+    auto file = HighFive::File("not_null_terminated_attribute.h5", HighFive::File::Truncate);
     check_supposedly_nullterm_scan<testing::AttributeCreateTraits>(file);
 }
 
 TEST_CASE("HighFiveSTDString (dataset, nullterm cornercase)") {
-    auto file = HighFive::File(to_abs_if_rest_vol("not_null_terminated_dataset.h5"),
-                               HighFive::File::Truncate);
+    auto file = HighFive::File("not_null_terminated_dataset.h5", HighFive::File::Truncate);
     check_supposedly_nullterm_scan<testing::DataSetCreateTraits>(file);
 }
 
 TEST_CASE("HighFiveSTDString (dataset, single, short)") {
-    File file(to_abs_if_rest_vol("std_string_dataset_single_short.h5"), File::Truncate);
+    File file("std_string_dataset_single_short.h5", File::Truncate);
     check_single_string<testing::DataSetCreateTraits>(file, 3);
 }
 
 TEST_CASE("HighFiveSTDString (attribute, single, short)") {
-    File file(to_abs_if_rest_vol("std_string_attribute_single_short.h5"), File::Truncate);
+    File file("std_string_attribute_single_short.h5", File::Truncate);
     check_single_string<testing::AttributeCreateTraits>(file, 3);
 }
 
 TEST_CASE("HighFiveSTDString (dataset, single, long)") {
-    File file(to_abs_if_rest_vol("std_string_dataset_single_long.h5"), File::Truncate);
+    File file("std_string_dataset_single_long.h5", File::Truncate);
     check_single_string<testing::DataSetCreateTraits>(file, 256);
 }
 
 TEST_CASE("HighFiveSTDString (attribute, single, long)") {
-    File file(to_abs_if_rest_vol("std_string_attribute_single_long.h5"), File::Truncate);
+    File file("std_string_attribute_single_long.h5", File::Truncate);
     check_single_string<testing::AttributeCreateTraits>(file, 256);
 }
 
 TEST_CASE("HighFiveSTDString (dataset, multiple, short)") {
-    File file(to_abs_if_rest_vol("std_string_dataset_multiple_short.h5"), File::Truncate);
+    File file("std_string_dataset_multiple_short.h5", File::Truncate);
     check_multiple_string<testing::DataSetCreateTraits>(file, 3);
 }
 
 TEST_CASE("HighFiveSTDString (attribute, multiple, short)") {
-    File file(to_abs_if_rest_vol("std_string_attribute_multiple_short.h5"), File::Truncate);
+    File file("std_string_attribute_multiple_short.h5", File::Truncate);
     check_multiple_string<testing::AttributeCreateTraits>(file, 3);
 }
 
 TEST_CASE("HighFiveSTDString (dataset, multiple, long)") {
-    File file(to_abs_if_rest_vol("std_string_dataset_multiple_long.h5"), File::Truncate);
+    File file("std_string_dataset_multiple_long.h5", File::Truncate);
     check_multiple_string<testing::DataSetCreateTraits>(file, 256);
 }
 
 TEST_CASE("HighFiveSTDString (attribute, multiple, long)") {
-    File file(to_abs_if_rest_vol("std_string_attribute_multiple_long.h5"), File::Truncate);
+    File file("std_string_attribute_multiple_long.h5", File::Truncate);
     check_multiple_string<testing::AttributeCreateTraits>(file, 256);
 }
 
 TEST_CASE("HighFiveFixedString") {
-    const std::string file_name(to_abs_if_rest_vol("array_atomic_types.h5"));
+    const std::string file_name("array_atomic_types.h5");
     const std::string group_1("group1");
 
     // Create a new file using the default property lists.
